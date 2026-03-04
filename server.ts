@@ -84,7 +84,15 @@ async function startServer() {
     const { query } = req.params;
     try {
       console.log(`[API] Searching for: ${query}`);
-      const results = await yahooFinance.search(query);
+      let results;
+      try {
+        results = await yahooFinance.search(query);
+      } catch (err) {
+        const message = err instanceof Error ? err.message : String(err);
+        if (!message.includes("Schema validation")) throw err;
+        console.warn("[API] Search schema validation failed; retrying without validation.");
+        results = await (yahooFinance as any).search(query, undefined, { validateResult: false });
+      }
       console.log(`[API] Search results for ${query}: ${results.quotes?.length || 0} quotes`);
       res.json(results);
     } catch (error) {
