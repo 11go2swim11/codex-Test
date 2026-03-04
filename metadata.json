@@ -1,0 +1,5 @@
+{
+  "name": "Yahoo Finance Stock Tracker",
+  "description": "An application to fetch and display stock trading data from Yahoo Finance.",
+  "requestFramePermissions": []
+}
