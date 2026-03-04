@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: codex-test
+    runtime: node
+    plan: free
+    buildCommand: npm install && npm run build
+    startCommand: node --import tsx server.ts
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production

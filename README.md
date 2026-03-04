@@ -29,3 +29,14 @@ View your app in AI Studio: https://ai.studio/apps/f0bb1dd9-9b0d-4595-b175-3d2ff
    `http://localhost:3000`
 3. Stop:
    `docker compose down`
+
+## Deploy to Render
+
+1. Push latest code to GitHub:
+   `git push`
+2. Open Render Dashboard and choose:
+   `New +` -> `Blueprint`
+3. Connect repo:
+   `https://github.com/11go2swim11/codex-Test`
+4. Render will detect `render.yaml` and create the web service.
+5. After deploy is done, open the generated Render URL.
