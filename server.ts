@@ -84,15 +84,21 @@ async function startServer() {
     const { query } = req.params;
     try {
       console.log(`[API] Searching for: ${query}`);
-      let results;
-      try {
-        results = await yahooFinance.search(query);
-      } catch (err) {
-        const message = err instanceof Error ? err.message : String(err);
-        if (!message.includes("Schema validation")) throw err;
-        console.warn("[API] Search schema validation failed; retrying without validation.");
-        results = await (yahooFinance as any).search(query, undefined, { validateResult: false });
+      const url = new URL("https://query2.finance.yahoo.com/v1/finance/search");
+      url.searchParams.set("q", query);
+      url.searchParams.set("quotesCount", "15");
+      url.searchParams.set("newsCount", "0");
+
+      const fallbackRes = await fetch(url.toString(), {
+        headers: {
+          "User-Agent":
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+        },
+      });
+      if (!fallbackRes.ok) {
+        throw new Error(`Search failed with status ${fallbackRes.status}`);
       }
+      const results = await fallbackRes.json();
       console.log(`[API] Search results for ${query}: ${results.quotes?.length || 0} quotes`);
       res.json(results);
     } catch (error) {
