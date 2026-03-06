@@ -28,10 +28,17 @@ export function SearchBar({ onSelect }: { onSelect: (symbol: string) => void }) 
         const res = await fetch(`/api/search/${encodeURIComponent(query)}`, {
           signal: controller.signal,
         });
+        if (!res.ok) {
+          throw new Error(`Search failed with status ${res.status}`);
+        }
         const data = await res.json();
         if (data.quotes) {
-          // Filter for stocks and ETFs, and ensure they have a symbol
-          setResults(data.quotes.filter((q: any) => q.symbol && (q.quoteType === 'EQUITY' || q.quoteType === 'ETF' || q.typeDisp)));
+          // Keep only stocks/ETFs and show a smaller, faster dropdown.
+          setResults(
+            data.quotes
+              .filter((q: any) => q.symbol && (q.quoteType === 'EQUITY' || q.quoteType === 'ETF'))
+              .slice(0, 8),
+          );
         }
       } catch (err) {
         if (err instanceof DOMException && err.name === 'AbortError') return;
@@ -41,7 +48,7 @@ export function SearchBar({ onSelect }: { onSelect: (symbol: string) => void }) 
       }
     };
 
-    const debounce = setTimeout(search, 300);
+    const debounce = setTimeout(search, 180);
     return () => {
       clearTimeout(debounce);
       controller.abort();
